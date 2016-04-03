@@ -29,14 +29,18 @@ def main():
     out_file = io.FileIO("output.zip", mode="w")
 
     content_lenght = response.getheader('Content-Lenght')
-    if content_lenght:
-        lenght = int(content_lenght)
-        download_lenght(response, out_file, lenght)
-    else:
-        download(response, out_file)
+    try:
+        if content_lenght:
+            lenght = int(content_lenght)
+            download_lenght(response, out_file, lenght)
+        else:
+            download(response, out_file)
+    except Exception as e:
+        print('Error while downloading file {}...'.format(sys.argv[1]))
+    finally:
+        out_file.close()
+        response.close()
 
-    response.close()
-    out_file.close()
     print("Finished")
 
 if __name__ == "__main__":

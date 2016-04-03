@@ -46,6 +46,20 @@ class DataTable:
         self._referenced = []
         self._data = []
 
+    def _get_name(self):
+        print('Getter executed!')
+        return self._name
+
+    def _set_name(self, _name):
+        print('Setter executed!')
+        self._name = _name
+
+    def _del_name(self):
+        print('Deletter executed!')
+        raise AttributeError('Cannot delete this attribute')
+
+    name = property(_get_name, _set_name, _del_name)
+
     def add_column(self, name, kind, desc=''):
         col = Column(name, kind, desc)
         self._columns.append(col)
@@ -112,6 +126,10 @@ class Column:
 
     validate = classmethod(_validate)
 
+    def validate_kind(self):
+        if not kind in ('bigint', 'varchar', 'numeric'):
+            raise InvalidDataTypeException
+
     def __str__(self):
         _str = 'Col: {} : {} {}'.format(self._name,
                                         self._kind,
@@ -149,3 +167,6 @@ class PrimaryKey(Column):
                                         self._kind,
                                         self._desc)
         return '{} - {}'.format('PK', _str)
+
+class InvalidDataTypeException(Exception):
+    pass
