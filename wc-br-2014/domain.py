@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 class Relationship:
     """Class that represents relationship between datatables
 
@@ -44,7 +46,7 @@ class DataTable:
         self._referenced = []
         self._data = []
 
-    def add_column(self, name, kind, desc):
+    def add_column(self, name, kind, desc=''):
         col = Column(name, kind, desc)
         self._columns.append(col)
         return col
@@ -92,6 +94,31 @@ class Column:
         self._kind = kind
         self._desc = desc
 
+    def _validate(clazz, kind, data):
+        if kind == 'bigint':
+            if isinstance(data, int):
+                return True
+            return False
+        elif kind == 'varchar':
+            if isinstance(data, str):
+                return True
+            return False
+        elif kind == 'numeric':
+            try:
+                value = Decimal(data)
+            except:
+                return False
+            return True
+
+    validate = classmethod(_validate)
+
+    def __str__(self):
+        _str = 'Col: {} : {} {}'.format(self._name,
+                                        self._kind,
+                                        self._desc)
+        return _str
+
+
     @property
     def name(self):
         return self._name
@@ -103,3 +130,22 @@ class Column:
     @property
     def desc(self):
         return self._desc
+
+class PrimaryKey(Column):
+    """Represents PK
+
+        PrimaryKey class, children of Column class.
+        This class represents a primary key for DataTable.
+
+        Attributes:
+            is_pk: (boolean) flag to tag key as primary key
+    """
+    def __init__(self, name, kind, desc=None):
+        super().__init__(name, kind, desc=desc)
+        self._is_pk = True
+
+    def __str__(self):
+        _str = 'Col: {} : {} {}'.format(self._name,
+                                        self._kind,
+                                        self._desc)
+        return '{} - {}'.format('PK', _str)
